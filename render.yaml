@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: api-tarefas
+    runtime: node
+    rootDir: api
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 22.13.0
+      - key: DB_PATH
+        value: /var/data/tarefas.db
+    disk:
+      name: dados-sqlite
+      mountPath: /var/data
+      sizeGB: 1
