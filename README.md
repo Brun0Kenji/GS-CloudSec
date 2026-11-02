@@ -1,6 +1,6 @@
-# Tarefas — API REST com SQLite
+# GS - CLOUD SECURITY PREVENTION e DEVSECOPS
 
-Aplicação web de lista de tarefas (CRUD) com:
+Aplicação web de lista de tarefas com:
 
 - **Front-end**: React (TanStack Start) — pasta `src/`
 - **API**: Node.js + Express — pasta `api/`
