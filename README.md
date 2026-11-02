@@ -10,8 +10,9 @@ Aplicação web de lista de tarefas com:
 
 ```mermaid
 flowchart LR
-  U[Usuário / Navegador] -->|HTTPS| F[Front-end React<br/>Azure App Service]
-  F -->|fetch JSON| A[API Express<br/>Azure App Service]
+  U[Usuário / Navegador] -->|HTTPS| S[App Node.js<br/>Azure App Service]
+  S --> F[Front-end React / TanStack Start]
+  S -->|/api| A[API Express]
   A -->|SQL| D[(SQLite<br/>tarefas.db em disco persistente)]
 ```
 
@@ -34,7 +35,7 @@ sequenceDiagram
   participant N as Navegador
   participant A as API
   participant D as SQLite
-  N->>A: POST /tarefas {"titulo":"Estudar"}
+  N->>A: POST /api/tarefas {"titulo":"Estudar"}
   A->>D: INSERT INTO tarefas (titulo) VALUES (?)
   D-->>A: lastInsertRowid
   A-->>N: 201 Created + tarefa em JSON
@@ -44,12 +45,12 @@ sequenceDiagram
 
 | Método | Rota | Descrição | Respostas |
 |---|---|---|---|
-| GET | `/` | Status da API | 200 |
-| GET | `/tarefas` | Lista todas | 200 |
-| GET | `/tarefas/:id` | Busca uma | 200, 404 |
-| POST | `/tarefas` | Cria (`{ "titulo": "..." }`) | 201, 400 |
-| PUT | `/tarefas/:id` | Atualiza (`titulo` e/ou `concluida`) | 200, 400, 404 |
-| DELETE | `/tarefas/:id` | Remove | 204, 404 |
+| GET | `/api/` | Status da API | 200 |
+| GET | `/api/tarefas` | Lista todas | 200 |
+| GET | `/api/tarefas/:id` | Busca uma | 200, 404 |
+| POST | `/api/tarefas` | Cria (`{ "titulo": "..." }`) | 201, 400 |
+| PUT | `/api/tarefas/:id` | Atualiza (`titulo` e/ou `concluida`) | 200, 400, 404 |
+| DELETE | `/api/tarefas/:id` | Remove | 204, 404 |
 
 ## Rodar localmente
 
@@ -65,27 +66,21 @@ bun install && bun run dev                 # front-end em http://localhost:8080
 |---|---|---|
 | `PORT` | 3000 | Porta HTTP |
 | `DB_PATH` | `./tarefas.db` | Caminho do arquivo SQLite |
-| `CORS_ORIGIN` | `*` | Domínio permitido do front-end |
+| `CORS_ORIGIN` | `*` | Domínio permitido quando a API é hospedada separadamente |
 
 ## Deploy no Azure App Service
 
-Para hospedar a aplicação no Azure, publique o front-end e a API em **dois App Services Linux separados**, ambos com Node.js 24. O front-end usa o preset Nitro `node-server`; `npm run build` gera o servidor e `npm start` o inicia.
+O front-end e a API são servidos pelo mesmo processo Node.js e pelo mesmo App Service Linux (Node.js 24). A API Express fica sob `/api`; o preset Nitro `node-middleware` permite que o servidor Express encaminhe as demais requisições ao front-end TanStack Start.
 
-Os workflows do GitHub Actions em `.github/workflows/` fazem build e deploy dos serviços separadamente:
+O workflow `.github/workflows/deploy-app.yml` compila e testa o projeto, empacota o servidor e publica a aplicação em um único App Service:
 
-1. Crie um App Service Linux para o front-end e outro para a API, usando Node.js 24.
-2. No GitHub, cadastre estas **Actions variables**:
-   - `FRONTEND_APP_NAME`: nome do App Service do front-end.
-   - `API_APP_NAME`: nome do App Service da API.
-   - `VITE_API_URL`: URL pública da API, sem barra final (por exemplo, `https://minha-api.azurewebsites.net`).
-3. Baixe o publish profile de cada App Service e cadastre como **Actions secrets**:
-   - `FRONTEND_PUBLISH_PROFILE`
-   - `API_PUBLISH_PROFILE`
-4. Configure no App Service da API:
-   - `CORS_ORIGIN`: origem pública do front-end (por exemplo, `https://meu-front.azurewebsites.net`).
-   - `DB_PATH`: `/home/tarefas.db`.
-   - Armazenamento persistente habilitado para `/home`.
-5. Configure o App Service do front-end para iniciar com `npm start` (ou deixe o detector de Node do App Service usar o script `start`).
-6. Envie as alterações para a branch `main`. Cada workflow publica somente o serviço correspondente. Também é possível iniciá-los manualmente em **GitHub → Actions**.
+1. Use um App Service **Linux** com Node.js 24. O App Service Windows existente não pode ser convertido; crie um Linux se necessário.
+2. No GitHub, cadastre a Action variable `APP_NAME` com o nome exato do App Service.
+3. Baixe o publish profile desse App Service e cadastre-o como o Action secret `APP_PUBLISH_PROFILE`. Não inclua esse XML no repositório.
+4. Configure `DB_PATH` como `/home/tarefas.db` nas variáveis do App Service e habilite o armazenamento persistente para `/home`.
+5. Configure o Startup Command como `npm start`.
+6. Envie as alterações para `main` ou execute **Deploy app to Azure** em **GitHub → Actions**.
 
-Os workflows precisam dos nomes e secrets acima antes de executar; não inclua publish profiles ou outras credenciais no repositório. O App Service Windows atual não pode ser convertido em Linux: para seguir esta configuração, crie novos App Services Linux.
+O workflow define `VITE_API_URL=/api` durante o build, então não é necessária uma URL separada para a API nem configuração de CORS entre serviços.
+
+Para desenvolvimento local, inicie a API em um terminal (`cd api; npm install; npm start`) e o front-end em outro (`npm run dev` na raiz). O `render.yaml` continua disponível para hospedar apenas a API no Render.
