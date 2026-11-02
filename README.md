@@ -1,6 +1,6 @@
-# Tarefas — API REST com SQLite
+# GS - CLOUD SECURITY PREVENTION e DEVSECOPS
 
-Aplicação web de lista de tarefas (CRUD) com:
+Aplicação web de lista de tarefas com:
 
 - **Front-end**: React (TanStack Start) — pasta `src/`
 - **API**: Node.js + Express — pasta `api/`
@@ -10,7 +10,7 @@ Aplicação web de lista de tarefas (CRUD) com:
 
 ```mermaid
 flowchart LR
-  U[Usuário / Navegador] -->|HTTPS| F[Front-end React<br/>Lovable]
+  U[Usuário / Navegador] -->|HTTPS| F[Front-end React<br/>]
   F -->|fetch JSON| A[API Express<br/>Render]
   A -->|SQL| D[(SQLite<br/>tarefas.db em disco persistente)]
 ```
