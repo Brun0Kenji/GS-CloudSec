@@ -59,12 +59,6 @@ cd api && npm install && npm start        # API em http://localhost:3000
 bun install && bun run dev                 # front-end em http://localhost:8080
 ```
 
-## Hospedagem (ponta a ponta)
-
-1. **GitHub**: conecte o projeto ao GitHub (Lovable → Configurações → Git).
-2. **API no Render**: New → Blueprint → escolha o repositório. O `render.yaml` cria o serviço com disco persistente em `/var/data` para o SQLite.
-3. **Front-end**: defina `VITE_API_URL` com a URL do Render (ex.: `https://api-tarefas.onrender.com`) e publique.
-
 ## Variáveis de ambiente (API)
 
 | Variável | Padrão | Uso |
