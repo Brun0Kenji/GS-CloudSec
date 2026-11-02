@@ -10,7 +10,7 @@ export const Route = createFileRoute("/")({
     meta: [
       { title: "Tarefas — CRUD com API e SQLite" },
       { name: "description", content: "Lista de tarefas consumindo uma API REST com banco SQLite." },
-      { property: "og:title", content: "Tarefas — CRUD com API e SQLite" },
+      { property: "og:title", content: "Tarefas" },
       { property: "og:description", content: "Lista de tarefas consumindo uma API REST com banco SQLite." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -66,7 +66,7 @@ function Index() {
   return (
     <main className="min-h-screen bg-background px-4 py-16">
       <div className="mx-auto max-w-xl">
-        <p className="font-mono text-xs uppercase tracking-widest text-primary">API REST · SQLite</p>
+        <p className="font-mono text-xs uppercase tracking-widest text-primary">Planner de tarefas</p>
         <h1 className="mt-2 font-display text-5xl text-foreground">Minhas tarefas</h1>
         <p className="mt-2 text-muted-foreground">
           {tarefas.length} tarefas · {feitas} concluídas
