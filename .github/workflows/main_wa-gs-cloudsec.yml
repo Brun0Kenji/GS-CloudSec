@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     permissions:
       contents: read #This is required for actions/checkout
 
@@ -28,7 +28,7 @@ jobs:
           npm install
           npm run build --if-present
           npm run test --if-present
-      
+
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
@@ -51,13 +51,13 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_B27FE41759F84E00BBB5CF72058E442B }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_D4B2839B95FA4BD6A9E3FF942531BEE6 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_732EEC3281F74E1CA6E3FBA48581C37C }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_DCBD600B8DAE4BA2A86EF8F91BD499DB }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_98D69D397160446A9BB28036496D051A }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_2532E1C42EDE4EE1957BF554DE4168E5 }}
 
       - name: 'Deploy to Azure Web App'
-        uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
         with:
           app-name: 'wa-gs-cloudsec'
           slot-name: 'Production'
