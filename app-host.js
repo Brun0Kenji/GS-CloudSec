@@ -6,6 +6,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use("/api", api);
+app.use(express.static(".output/public"));
 app.use(frontend);
 
 app.listen(PORT, () => console.log(`Aplicação rodando na porta ${PORT}`));
