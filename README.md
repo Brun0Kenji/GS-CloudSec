@@ -41,17 +41,6 @@ sequenceDiagram
   A-->>N: 201 Created + tarefa em JSON
 ```
 
-## Endpoints
-
-| Método | Rota | Descrição | Respostas |
-|---|---|---|---|
-| GET | `/api/` | Status da API | 200 |
-| GET | `/api/tarefas` | Lista todas | 200 |
-| GET | `/api/tarefas/:id` | Busca uma | 200, 404 |
-| POST | `/api/tarefas` | Cria (`{ "titulo": "..." }`) | 201, 400 |
-| PUT | `/api/tarefas/:id` | Atualiza (`titulo` e/ou `concluida`) | 200, 400, 404 |
-| DELETE | `/api/tarefas/:id` | Remove | 204, 404 |
-
 ## Rodar localmente
 
 ```bash
