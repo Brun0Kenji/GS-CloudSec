@@ -61,15 +61,15 @@ bun install && bun run dev                 # front-end em http://localhost:8080
 
 O front-end e a API são servidos pelo mesmo processo Node.js e pelo mesmo App Service Linux (Node.js 24). A API Express fica sob `/api`; o preset Nitro `node-middleware` permite que o servidor Express encaminhe as demais requisições ao front-end TanStack Start.
 
-O workflow `.github/workflows/deploy-app.yml` compila e testa o projeto, empacota o servidor e publica a aplicação em um único App Service:
+### Resumo do passo a passo
 
-1. Use um App Service **Linux** com Node.js 24. O App Service Windows existente não pode ser convertido; crie um Linux se necessário.
-2. No GitHub, cadastre a Action variable `APP_NAME` com o nome exato do App Service.
-3. Baixe o publish profile desse App Service e cadastre-o como o Action secret `APP_PUBLISH_PROFILE`. Não inclua esse XML no repositório.
-4. Configure `DB_PATH` como `/home/tarefas.db` nas variáveis do App Service e habilite o armazenamento persistente para `/home`.
-5. Configure o Startup Command como `npm start`.
-6. Envie as alterações para `main` ou execute **Deploy app to Azure** em **GitHub → Actions**.
+1. No Portal Azure, crie um recurso **Web App** com publicação por código, sistema operacional **Linux**, runtime **Node.js 24**, região desejada e um plano compatível com o orçamento (o plano B1 é pago). Aguarde a criação e anote o nome exato do App Service.
+2. No App Service, configure o comando de inicialização `npm start` e a variável `DB_PATH=/home/tarefas.db`. Habilite e confirme o armazenamento persistente em `/home`; o SQLite desta arquitetura é adequado para uma única instância.
+3. No GitHub, em **Settings → Secrets and variables → Actions**, crie a variável `APP_NAME` com o nome exato do App Service e o secret `APP_PUBLISH_PROFILE` com o perfil de publicação baixado desse mesmo recurso. Nunca adicione o XML ao repositório, ao README ou a capturas.
+4. Antes de publicar, confira os workflows em `.github/workflows`: `deploy-app.yml` usa `APP_NAME` e `APP_PUBLISH_PROFILE`, enquanto `main_wa-gs-cloudsec.yml` contém outro destino e autenticação. Ajuste ou desative o workflow que não será usado para evitar deploy no aplicativo errado.
+5. Na aba **Actions** do GitHub, execute **Deploy app to Azure** na branch `main`, ou envie para `main` uma alteração coberta pelos caminhos configurados no workflow. O pipeline instala as dependências, compila o front-end, executa os testes e publica o pacote.
+6. Após o deploy, confirme a execução do workflow, acesse a aplicação por HTTPS e verifique a interface e as rotas `GET /api/` e `GET /api/tarefas`. Teste as operações de tarefas e, após reiniciar o serviço, confirme que os dados persistem.
 
-O workflow define `VITE_API_URL=/api` durante o build, então não é necessária uma URL separada para a API nem configuração de CORS entre serviços.
+O workflow `.github/workflows/deploy-app.yml` automatiza o build, os testes, o empacotamento e a publicação. Ele define `VITE_API_URL=/api` durante o build; como o front-end e a API compartilham o mesmo domínio, não é necessária uma URL separada para a API nem configuração de CORS entre serviços.
 
 Para desenvolvimento local, inicie a API em um terminal (`cd api; npm install; npm start`) e o front-end em outro (`npm run dev` na raiz). O `render.yaml` continua disponível para hospedar apenas a API no Render.
